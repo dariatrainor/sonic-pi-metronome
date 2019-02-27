@@ -1,23 +1,25 @@
-beats_per_bar = 4
-clicks_per_beat = 4
-use_bpm 100
+#Config. Set the values of the metronome here
 
+#Number of beats per minute
+bpm = 50
 
+# Pattern for the beat 1 to play the beat, 0 to skip the beat, any other positive integer for the amplitude
+clicks_per_beat = (ring 3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)
 
-clicks_per_bar = clicks_per_beat * beats_per_bar
-sleep_value = 1.0/clicks_per_beat
+# Randomly mutes beats. The bigger the number, the more beats will be muted. Set to 1 to not mute at all
+mute_probability = 1
+
+#----------------------------------------------------------------------
+
+sleep_value = 1.0/clicks_per_beat.length
 
 live_loop :metronome do
-  clicks_per_beat.times do
+  use_bpm bpm
+  clicks_per_beat.length.times do
     tick
     
-    if look % clicks_per_bar == 0
-      amplitude = 3
-    else
-      amplitude = 1
-    end
+    sample :elec_flip, amp: clicks_per_beat.look if  (clicks_per_beat.look > 0) || one_in(mute_probability)
     
-    sample :elec_tick, amp: amplitude
     sleep sleep_value
   end
 end
